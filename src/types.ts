@@ -21,6 +21,7 @@ export interface ServiceNowTicket {
   closed_at?: string;
   close_code?: string;
   close_notes?: string;
+  work_notes?: string;
   sys_created_on: string;
   sys_updated_on: string;
   sys_updated_by: string;
