@@ -1,0 +1,141 @@
+name: Auto Deployment
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+    types: [opened, synchronize, reopened]
+
+jobs:
+  # Preview deployment for PRs
+  deploy-preview:
+    name: Deploy Preview (PR)
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18.x'
+        cache: 'npm'
+    
+    - name: Install dependencies
+      run: npm ci
+    
+    - name: Build application
+      run: npm run build
+    
+    - name: Deploy to Netlify Preview
+      uses: nwtgck/actions-netlify@v3.0
+      id: deploy-preview
+      with:
+        publish-dir: './dist'
+        production-deploy: false
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        deploy-message: "Preview deploy from GitHub Actions - PR #${{ github.event.number }}"
+        alias: deploy-preview-${{ github.event.number }}
+        enable-pull-request-comment: true
+        enable-commit-comment: true
+      env:
+        NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+        NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
+    
+    - name: Preview Deploy Summary
+      run: |
+        echo "🚀 Preview Deployed!"
+        echo "🔗 Preview URL: ${{ steps.deploy-preview.outputs.deploy-url }}"
+        echo "📋 PR #${{ github.event.number }}"
+
+  # Production deployment on main branch push
+  deploy-production:
+    name: Deploy Production
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    needs: [build-and-test]
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18.x'
+        cache: 'npm'
+    
+    - name: Install dependencies
+      run: npm ci
+    
+    - name: Build application
+      run: npm run build
+      env:
+        VITE_APP_ENV: production
+    
+    - name: Deploy to Netlify Production
+      uses: nwtgck/actions-netlify@v3.0
+      id: deploy-prod
+      with:
+        publish-dir: './dist'
+        production-deploy: true
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        deploy-message: "Production deploy from GitHub Actions"
+        enable-commit-comment: true
+      env:
+        NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+        NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
+    
+    - name: Production Deploy Summary
+      run: |
+        echo "🚀 Production Deployed!"
+        echo "🔗 Production URL: ${{ steps.deploy-prod.outputs.deploy-url }}"
+        echo "🎉 Live at: https://servicenow-ticket-analyzer.netlify.app"
+
+  # Build and test job (required by deploy-production)
+  build-and-test:
+    name: Build & Test
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18.x'
+        cache: 'npm'
+    
+    - name: Install dependencies
+      run: npm ci
+    
+    - name: Run TypeScript check
+      run: npx tsc --noEmit
+    
+    - name: Build application
+      run: npm run build
+    
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: production-build
+        path: dist/
+        retention-days: 5
+
+  # Cleanup preview deployments on PR close
+  cleanup-preview:
+    name: Cleanup Preview
+    runs-on: ubuntu-latest
+    if: github.event.action == 'closed'
+    
+    steps:
+    - name: Delete Netlify Preview
+      run: |
+        echo "🧹 Cleaning up preview deployment for PR #${{ github.event.number }}"
+        # Netlify previews are automatically cleaned up after some time
+        echo "✅ Preview deployment will be automatically removed by Netlify"
