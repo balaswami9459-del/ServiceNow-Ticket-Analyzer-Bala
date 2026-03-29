@@ -11,17 +11,17 @@ class ServiceNowClient {
   private client: AxiosInstance;
   private config: ServiceNowConfig;
 
-  constructor(config: ServiceNowConfig) {
-    this.config = config;
+  constructor(_config: ServiceNowConfig) {
+    this.config = _config;
     this.client = axios.create({
-      baseURL: `${config.instanceUrl}/api/now/table`,
+      baseURL: `${_config.instanceUrl}/api/now/table`,
       headers: {
         'Content-Type': 'application/json',
         'Accept': 'application/json'
       },
       auth: {
-        username: config.username,
-        password: config.password
+        username: _config.username,
+        password: _config.password
       }
     });
 
@@ -91,7 +91,7 @@ class ServiceNowClient {
     const response = await this.client.get('/incident', { params });
     
     // Get total count
-    const countParams = { ...params, sysparm_count: 'true' };
+    const countParams: Record<string, any> = { ...params, sysparm_count: 'true' };
     delete countParams.sysparm_limit;
     delete countParams.sysparm_offset;
     

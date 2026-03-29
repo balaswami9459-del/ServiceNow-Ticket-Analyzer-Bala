@@ -7,8 +7,7 @@ import {
   Plus,
   Menu,
   X,
-  ChevronRight,
-  LogOut
+  ChevronRight
 } from 'lucide-react';
 
 interface LayoutProps {

@@ -1,14 +1,14 @@
 import { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import {
   AlertCircle,
   Loader2,
   ArrowLeft,
   CheckCircle
 } from 'lucide-react';
-import { getClient, isClientInitialized } from '../services/ServiceNowClient';
 import { getMockService } from '../services/MockServiceNowService';
-import { CreateTicketRequest, PriorityLabels, TicketStateLabels } from '../types';
+import { getClient, isClientInitialized } from '../services/ServiceNowClient';
+import { CreateTicketRequest, PriorityLabels } from '../types';
 
 export default function CreateTicket() {
   const navigate = useNavigate();

@@ -5,7 +5,7 @@ import {
   Loader2,
   RefreshCw
 } from 'lucide-react';
-import { getClient, initializeClient, isClientInitialized } from '../services/ServiceNowClient';
+import { initializeClient, isClientInitialized } from '../services/ServiceNowClient';
 import { ServiceNowConfig } from '../types';
 
 export default function Settings() {

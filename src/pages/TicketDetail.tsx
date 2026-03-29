@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useParams, useNavigate, Link } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom';
 import {
   AlertCircle,
   Loader2,
@@ -19,7 +19,6 @@ import { TicketAnalysis } from '../components/TicketAnalysis';
 
 export default function TicketDetail() {
   const { sysId } = useParams<{ sysId: string }>();
-  const navigate = useNavigate();
   const [ticket, setTicket] = useState<ServiceNowTicket | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);

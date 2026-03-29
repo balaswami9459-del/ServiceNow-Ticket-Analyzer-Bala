@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { AlertCircle, CheckCircle2, Loader2 } from 'lucide-react';
-import { initializeClient, ServiceNowClient } from '../services/ServiceNowClient';
+import { initializeClient } from '../services/ServiceNowClient';
 
 interface ConnectionSetupProps {
   onComplete: () => void;
