@@ -9,10 +9,8 @@ import {
 
 class ServiceNowClient {
   private client: AxiosInstance;
-  private config: ServiceNowConfig;
 
   constructor(_config: ServiceNowConfig) {
-    this.config = _config;
     this.client = axios.create({
       baseURL: `${_config.instanceUrl}/api/now/table`,
       headers: {
